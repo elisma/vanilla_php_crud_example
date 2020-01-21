@@ -14,7 +14,13 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $crud = new ProfileCRUD();
 $request = $crud->delete();
 
-echo json_encode($request);
+if($request){
+    $response= ['status'=>'User deleted'];
+}else{
+    $response= ['status'=>'User delete failed'];
+
+}
+echo json_encode($response);;
 
 
 ?>

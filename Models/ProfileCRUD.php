@@ -6,7 +6,6 @@ namespace Models;
 include_once '../Utils/Database.php';
 
 use PDO;
-use stdClass;
 use Utils\Database;
 
 class ProfileCRUD
@@ -17,37 +16,34 @@ class ProfileCRUD
     private $connection;
 
     // table name
-    private $table_name = "Profiles";
 
 
-    public function __construct()
-    {
+    public function __construct() {
         // INCLUDING DATABASE AND MAKING OBJECT
         $db_connection = new Database();
         $this->connection = $db_connection->get_connection();
     }
 
     //C
-    public function update()
-    {
+    public function update() {
 
 
-        parse_str( file_get_contents('php://input'),$update_vars);
+        parse_str(file_get_contents('php://input'), $update_vars);
 
 //lloking for id in PUT parameters
         if (isset($update_vars['id']) && $update_vars['id']) {
 
             $profile_id = $update_vars['id'];
 
-            //GET POST BY ID FROM DATABASE
-            $get_post = "SELECT * FROM `profiles` WHERE id=:profile_id";
-            $get_stmt = $this->connection->prepare($get_post);
+            //GET PROFILE BY ID FROM DATABASE
+            $get_profile = "SELECT * FROM `profiles` WHERE id=:profile_id";
+            $get_stmt = $this->connection->prepare($get_profile);
             $get_stmt->bindValue(':profile_id', $profile_id, PDO::PARAM_INT);
             $get_stmt->execute();
 
-            //CHECK WHETHER THERE IS ANY POST IN OUR DATABASE
+            //CHECK WHETHER THERE IS ANY PROFILE IN OUR DATABASE
             if ($get_stmt->rowCount() == 0) return FALSE;
-            // FETCH POST FROM DATBASE
+            // FETCH PROFILE FROM DATBASE
             $row = $get_stmt->fetch(PDO::FETCH_ASSOC);
 
             // CHECK, IF NEW UPDATE REQUEST DATA IS AVAILABLE THEN SET IT OTHERWISE SET OLD DATA
@@ -75,8 +71,7 @@ class ProfileCRUD
     }
 
     //R
-    public function read()
-    {
+    public function read() {
 
         // CHECK GET ID PARAMETER OR NOT
         $profile_id = FALSE;
@@ -103,7 +98,7 @@ LEFT JOIN phones as ph  ON p.id = ph.profile_id
         $request->execute();
         $data = array();
 
-//CHECK WHETHER THERE IS ANY POST IN OUR DATABASE
+//CHECK WHETHER THERE IS ANY PROFILE IN OUR DATABASE
         if ($request->rowCount() > 0) {
 
 
@@ -120,25 +115,22 @@ LEFT JOIN phones as ph  ON p.id = ph.profile_id
     }
 
     //U
-    public function create()
-    {
+    public function create() {
 
-
-
-// TODO: i havent tested thiss!! finish it
         if (isset($_POST['first_names']) && $_POST['first_names'] && isset($_POST['surnames']) && $_POST['surnames']) {
             // CHECK DATA VALUE IS EMPTY OR NOT
 
-                $insert_query = "INSERT INTO `profiles`(first_names,surnames) VALUES(:first_names,:surnames)";
+            $insert_query = "INSERT INTO `profiles`(first_names,surnames) VALUES(:first_names,:surnames)";
 
-                $insert_stmt = $this->connection->prepare($insert_query);
-                // DATA BINDING
-                $insert_stmt->bindValue(':first_names', htmlspecialchars(strip_tags($_POST['first_names'])), PDO::PARAM_STR);
-                $insert_stmt->bindValue(':surnames', htmlspecialchars(strip_tags($_POST['surnames'])), PDO::PARAM_STR);
+            $insert_stmt = $this->connection->prepare($insert_query);
+            // DATA BINDING
+            $insert_stmt->bindValue(':first_names', htmlspecialchars(strip_tags($_POST['first_names'])), PDO::PARAM_STR);
+            $insert_stmt->bindValue(':surnames', htmlspecialchars(strip_tags($_POST['surnames'])), PDO::PARAM_STR);
 
-                if ($insert_stmt->execute()) {
-                    return 'Data Inserted Successfully';
-                }
+            if ($insert_stmt->execute()) {
+
+                return $this->connection->lastInsertId();
+            }
 
         }
 
@@ -146,20 +138,28 @@ LEFT JOIN phones as ph  ON p.id = ph.profile_id
     }
 
     //D
-    public function delete()
-    {
+    public function delete() {
 
-        parse_str( file_get_contents('php://input'),$delete_vars);
+        parse_str(file_get_contents('php://input'), $delete_vars);
 
 //CHECKING, IF ID AVAILABLE ON $data
-        if (isset( $delete_vars['id']) && $profile_id = $delete_vars['id']) {
+        if (isset($delete_vars['id']) && $profile_id = $delete_vars['id']) {
 
-            //DELETE POST BY ID FROM DATABASE
-            $delete_post = "DELETE FROM `profiles` WHERE id=:profile_id";
-            $delete_post_stmt = $this->connection->prepare($delete_post);
-            $delete_post_stmt->bindValue(':profile_id', $profile_id, PDO::PARAM_INT);
+            //GET PROFILE BY ID FROM DATABASE
+            $get_profile = "SELECT * FROM `profiles` WHERE id=:profile_id";
+            $get_stmt = $this->connection->prepare($get_profile);
+            $get_stmt->bindValue(':profile_id', $delete_vars['id'], PDO::PARAM_INT);
+            $get_stmt->execute();
 
-            if ($delete_post_stmt->execute()) {
+            //CHECK WHETHER THERE IS ANY PROFILE IN OUR DATABASE
+            if ($get_stmt->rowCount() == 0) return FALSE;
+
+            //DELETE PROFILE BY ID FROM DATABASE
+            $delete_profile = "DELETE FROM `profiles` WHERE id=:profile_id";
+            $delete_profile_stmt = $this->connection->prepare($delete_profile);
+            $delete_profile_stmt->bindValue(':profile_id', $profile_id, PDO::PARAM_INT);
+
+            if ($delete_profile_stmt->execute()) {
                 return TRUE;
             }
 
