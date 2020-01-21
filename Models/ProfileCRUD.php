@@ -89,12 +89,12 @@ class ProfileCRUD
           GROUP_CONCAT( DISTINCT e.email SEPARATOR ', ') as emails
      FROM profiles as p
 LEFT JOIN emails as e  ON p.id = e.profile_id
-LEFT JOIN phones as ph  ON p.id = ph.profile_id
- GROUP BY p.id
- ";
-
+LEFT JOIN phones as ph  ON p.id = ph.profile_id ";
+if($profile_id) $query= $query."WHERE p.id=:profile_id";
+$query= $query." GROUP BY p.id ";
         $request = $this->connection->prepare($query);
 
+        $request->bindValue(':profile_id', $profile_id, PDO::PARAM_INT);
         $request->execute();
         $data = array();
 
