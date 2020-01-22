@@ -15,10 +15,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 //
 $crud = new EmailCRUD();
 $request = $crud->update();
-if($request){
-    $response= ['status'=>'Email updated'];
-}else{
-    $response= ['status'=>'Email update failed'];
+if ($request) {
+    $response = ['status' => 'Email updated'];
+} else {
+    $response = ['status' => 'Email update failed'];
 
 }
 echo json_encode($response);

@@ -14,10 +14,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $crud = new EmailCRUD();
 $request = $crud->delete();
 
-if($request){
-    $response= ['status'=>'Email deleted'];
-}else{
-    $response= ['status'=>'Email delete failed'];
+if ($request) {
+    $response = ['status' => 'Email deleted'];
+} else {
+    $response = ['status' => 'Email delete failed'];
 
 }
 echo json_encode($response);;
